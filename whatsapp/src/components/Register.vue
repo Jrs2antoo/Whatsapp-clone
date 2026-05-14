@@ -22,7 +22,7 @@ const register = async () => {
           avatar: ""
         }
     )
-    await router.push("/login")
+    await router.push("/setup");
 
   } catch (error) {
     console.log(error)

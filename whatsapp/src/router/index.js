@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase.js";
+import { auth, db } from "../firebase.js";
+import { doc, getDoc } from "firebase/firestore";
 import LoginVista from "../views/LoginVista.vue";
 import RegisterVista from "../views/RegistroVista.vue";
 import SetUpVista from "../views/SetUpVista.vue";
@@ -59,21 +60,42 @@ router.beforeEach(async (to, from, next) => {
 
   const user = await getCurrentUser();
 
-  if (
-    user &&
-    (
-      to.path === "/login" ||
-      to.path === "/register"
-    )
-  ) {
+  if (user) {
 
-    next("/chat");
-    return;
+    const userRef = doc(db, "users", user.uid);
+
+    const userSnap = await getDoc(userRef);
+
+    const hasProfile = userSnap.exists();
+
+    if (
+      !hasProfile &&
+      to.path !== "/setup"
+    ) {
+
+      next("/setup");
+
+      return;
+    }
+
+    if (
+      hasProfile &&
+      (
+        to.path === "/login" ||
+        to.path === "/register"
+      )
+    ) {
+
+      next("/chat");
+
+      return;
+    }
   }
 
   if (to.meta?.requiresAuth && !user) {
 
     next("/login");
+
     return;
   }
 
