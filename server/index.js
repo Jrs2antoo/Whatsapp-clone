@@ -6,11 +6,12 @@ const app = express();
 
 app.use(cors());
 
+const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173"
+    origin: "*"
   }
 });
 
@@ -65,6 +66,7 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("Servidor corriendo en puerto 3000");
+
+server.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
